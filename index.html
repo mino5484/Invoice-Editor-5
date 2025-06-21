@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مولّد الفاتورة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8fafc;
+    }
+    .receipt {
+      font-family: 'Tajawal', sans-serif;
+      background-color: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.25rem 0.5rem;
+      border-bottom: 1px solid #ddd;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+  <div class="text-center space-y-6 text-lg">
+    <h1 class="text-2xl font-bold">🧾 فاتورة عشوائية</h1>
+    <button onclick="generateReceipt()" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">✨ توليد فاتورة</button>
+    <button onclick="downloadAsImage()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">⬇️ تحميل الفاتورة كصورة</button>
+    <div id="receiptContainer" class="receipt mt-6 text-left shadow text-base leading-loose space-y-2"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    const products = [
+      { name: "Nouilles jumbo", price: 120 },
+      { name: "Amir Clean", price: 250 },
+      { name: "Celia lait", price: 180 },
+      { name: "Molfix", price: 750 },
+      { name: "Venus", price: 300 },
+      { name: "Maxon", price: 350 },
+      { name: "Ifruit Jus", price: 100 },
+      { name: "Rouiba", price: 110 },
+      { name: "Ramy", price: 90 },
+      { name: "Glace Gini", price: 80 },
+      { name: "Mahboul", price: 60 },
+      { name: "Life détergent", price: 250 },
+      { name: "Izdihar", price: 130 },
+      { name: "Flux Care", price: 200 },
+      { name: "Candia", price: 180 },
+      { name: "Test", price: 80 },
+      { name: "Tassili camembert", price: 350 },
+      { name: "Tartino", price: 130 },
+      { name: "Soummam lait", price: 90 },
+      { name: "Sidi Saada camembert", price: 330 },
+      { name: "Ricamar", price: 140 },
+      { name: "Margarine Sol", price: 120 },
+      { name: "Margarine Many", price: 110 },
+      { name: "Margarine Fleurial", price: 130 },
+      { name: "Margarine Dima", price: 130 },
+      { name: "El Mordjene", price: 70 },
+      { name: "Krima", price: 70 },
+      { name: "Confiture Telloise", price: 140 },
+      { name: "Fleurial Mayonnaise", price: 150 },
+      { name: "Twisco", price: 120 },
+      { name: "Flan Nouara", price: 80 },
+      { name: "Moon", price: 50 },
+      { name: "Bifa", price: 80 },
+      { name: "Chocolat Taj", price: 100 },
+      { name: "Nounours", price: 50 },
+      { name: "CAB", price: 70 },
+      { name: "Bimo", price: 60 },
+      { name: "Bimbies", price: 50 },
+      { name: "Aroma", price: 80 },
+      { name: "Patissy", price: 90 },
+      { name: "Sidna", price: 120 },
+      { name: "Regalo", price: 110 },
+      { name: "Hodna lait", price: 90 },
+      { name: "Café", price: 250 },
+      { name: "Bingo", price: 70 },
+      { name: "Confiture Sabri", price: 110 },
+      { name: "Moutarde Extra", price: 100 },
+      { name: "Chocodada", price: 90 },
+      { name: "El Wejdene", price: 80 },
+      { name: "Ela", price: 100 },
+      { name: "Isabel", price: 300 },
+      { name: "Lesieur", price: 280 },
+      { name: "Glace Prima", price: 100 },
+      { name: "Maratun Atun", price: 200 },
+      { name: "Cheezy", price: 130 },
+      { name: "ISIS", price: 300 },
+      { name: "Soummam Lben", price: 90 },
+      { name: "Biscuits Kool", price: 70 },
+      { name: "Chocolat Moment", price: 100 },
+      { name: "Canbébé", price: 850 },
+      { name: "Brilex", price: 300 },
+      { name: "Force Xpress", price: 250 },
+      { name: "Café Many", price: 200 },
+      { name: "Aigle détergent", price: 220 }
+    ];
+
+    function generateReceipt() {
+      const container = document.getElementById("receiptContainer");
+      const selected = products.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+      let total = 0;
+      let now = new Date();
+      const date = now.toLocaleDateString("fr-DZ");
+      const time = now.toLocaleTimeString("fr-DZ", {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+
+      let html = `<h2 class="text-center font-bold mb-2">SUPÉRETTE</h2>`;
+      html += `<div class="mb-2 text-sm">Client: Divers<br>N°: 0<br>VAL: 0.00 DA</div>`;
+      html += `
+        <table>
+          <thead>
+            <tr class="bg-gray-100">
+              <th>Produit</th>
+              <th>Qte</th>
+              <th>P.U</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      selected.forEach(prod => {
+        const qty = Math.floor(Math.random() * 3) + 1;
+        const lineTotal = qty * prod.price;
+        total += lineTotal;
+        html += `
+          <tr>
+            <td>${prod.name}</td>
+            <td>${qty}</td>
+            <td>${prod.price}</td>
+            <td>${lineTotal}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+          </tbody>
+        </table>
+        <p>Total: ${total.toFixed(2)} DA</p>
+        <p>Net à payer: ${total.toFixed(2)} DA</p>
+        <p>Reçu: 0.00 DA &nbsp; Rendu: 0.00 DA</p>
+        <p class="text-lg font-bold">Date: ${date}</p>
+        <p class="text-lg font-bold">Heure: ${time}</p>
+        <p class="text-center mt-4">Merci De Votre Visite</p>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function downloadAsImage() {
+      const receipt = document.getElementById("receiptContainer");
+      if (!receipt.innerHTML.trim()) {
+        alert("يرجى توليد الفاتورة أولاً.");
+        return;
+      }
+
+      html2canvas(receipt, { scale: 3 }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "facture.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+  </script>
+</body>
+  </html>
